@@ -3,26 +3,26 @@
 #include <windows.h>
 
 /*Calling them here so we can use them after main*/
-void drawinterface(int x, int y, int width, int height, int fruitX, int fruitY, int score);
-bool gamelogic(int &x, int &y, int &width, int &height, int &fruitX, int &fruitY, int &score);
+void drawinterface(int x, int y, int width, int height, int fruitX, int fruitY, int score, int tailLength, int tailX, int tailY);
+bool gamelogic(int &x, int &y, int &width, int &height, int &fruitX, int &fruitY, int &score, int &tailLength, int &tailX, int &tailY);
 
 int main()
 {
     /*Init of variables*/
-    int x = 10, y = 10, width = 30, height = 25, fruitX = rand() % width, fruitY = rand() % height, score = 0;
+    int x = 10, y = 10, width = 30, height = 25, fruitX = rand() % width, fruitY = rand() % height, score, tailLength, tailX, tailY = 0;
     bool yt = false;
 
     system("CLS"); // Clean screen
-    drawinterface(x, y, width, height, fruitX, fruitY, score);
-    while (!gamelogic(x, y, width, height, fruitX, fruitY, score))
+    drawinterface(x, y, width, height, fruitX, fruitY, score, tailLength, tailX, tailY);
+    while (!gamelogic(x, y, width, height, fruitX, fruitY, score, tailLength, tailX, tailY))
     {
-        drawinterface(x, y, width, height, fruitX, fruitY, score);
+        drawinterface(x, y, width, height, fruitX, fruitY, score, tailLength, tailX, tailY);
     }
     return 0;
 }
 
 /*Function to display whole interface(border and score)*/
-void drawinterface(int x, int y, int width, int height, int fruitX, int fruitY, int score)
+void drawinterface(int x, int y, int width, int height, int fruitX, int fruitY, int score, int tailLength, int tailX, int tailY)
 {
     system("CLS"); // Clean screen
     for (int i = 0; i < height; i++)
@@ -40,6 +40,11 @@ void drawinterface(int x, int y, int width, int height, int fruitX, int fruitY, 
             {
                 std::cout << '#';
                 continue;
+            }
+            /*Grow snake's tail TODO*/
+            if ()
+            {
+                std::cout << 'o';
             }
             /*Left border*/
             if (j % width == 0)
@@ -74,7 +79,7 @@ void drawinterface(int x, int y, int width, int height, int fruitX, int fruitY, 
 }
 
 /*Whole gamelogic responsible for movement and logic of the game*/
-bool gamelogic(int &x, int &y, int &width, int &height, int &fruitX, int &fruitY, int &score)
+bool gamelogic(int &x, int &y, int &width, int &height, int &fruitX, int &fruitY, int &score, int &tailLength, int &tailX, int &tailY)
 {
     char key = getch();
     switch (key)
@@ -116,8 +121,8 @@ bool gamelogic(int &x, int &y, int &width, int &height, int &fruitX, int &fruitY
         break;
     }
 
-    /*If snake touch border endgame*/
-    if (x == width - 1 || x < 1 || y == height - 1 || y < 1)
+    /*If snake touch border or it's own tail endgame*/
+    if (x == width - 1 || x < 1 || y == height - 1 || y < 1 || x == tailX && y == tailY)
     {
         system("CLS");
         std::cout << "Game Over!\nScore: " << score;
@@ -130,6 +135,14 @@ bool gamelogic(int &x, int &y, int &width, int &height, int &fruitX, int &fruitY
         fruitX = rand() % 19;
         fruitY = rand() % 19;
         score++;
+        tailLength++;
+    }
+
+    /*If tail collides with fruit, respawn fruit to other coordinates*/
+    if (tailX == fruitX && tailY == fruitY)
+    {
+        fruitX = rand() % 19;
+        fruitY = rand() % 19;
     }
 
     return false;
