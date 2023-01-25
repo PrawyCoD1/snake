@@ -2,98 +2,135 @@
 #include <conio.h>
 #include <windows.h>
 
-void drawinterface(int x, int y);
-bool controls(int *x, int *y);
+/*Calling them here so we can use them after main*/
+void drawinterface(int x, int y, int width, int height, int fruitX, int fruitY, int score);
+bool gamelogic(int &x, int &y, int &width, int &height, int &fruitX, int &fruitY, int &score);
 
 int main()
 {
-    int fruitX, fruitY, score = 0;
-    int x, y = 10;
+    /*Init of variables*/
+    int x = 10, y = 10, width = 30, height = 25, fruitX = rand() % width, fruitY = rand() % height, score = 0;
+    bool yt = false;
 
-    system("CLS"); // We're clearing the console so previous text won't interrupt with our game
-    drawinterface(x, y);
-    while (!controls(&x, &y))
+    system("CLS"); // Clean screen
+    drawinterface(x, y, width, height, fruitX, fruitY, score);
+    while (!gamelogic(x, y, width, height, fruitX, fruitY, score))
     {
+        drawinterface(x, y, width, height, fruitX, fruitY, score);
     }
-
     return 0;
 }
 
-void drawinterface(int x, int y)
+/*Function to display whole interface(border and score)*/
+void drawinterface(int x, int y, int width, int height, int fruitX, int fruitY, int score)
 {
-    int width = 30;
-    int height = 25;
-
+    system("CLS"); // Clean screen
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-            if (j % width == 0) // left border
+            /*Spawn snake on x,y coordinates*/
+            if (i == y && j == x)
             {
-                printf("%c", 179);
+                std::cout << '&';
+                continue;
             }
-            else if (j == 29) // right border
+            /*Spawn fruit on fruitX,fruitY coordinates*/
+            if (i == fruitY && j == fruitX)
             {
-                printf("%c", 179);
+                std::cout << '#';
+                continue;
             }
-            else if (i % height == 0) // top border
+            /*Left border*/
+            if (j % width == 0)
             {
-                printf("%c", 196);
+                std::cout << (char)179;
             }
-            else if (i == 24) // bottom border
+            /*Right border*/
+            else if (j == 29)
             {
-                printf("%c", 196);
+                std::cout << (char)179;
+            }
+            /*Top border*/
+            else if (i % height == 0)
+            {
+                std::cout << (char)196;
+            }
+            /*Bottom border*/
+            else if (i == 24)
+            {
+                std::cout << (char)196;
             }
             else
             {
-                printf(" ");
-            }
-
-            if (i == y && j == x)
-            {
-                printf("@");
-                continue;
+                std::cout << ' ';
             }
         }
-        printf("\n");
+        std::cout << '\n';
     }
+    /*Displaying player's score*/
+    std::cout << std::endl;
+    std::cout << "Score: " << score << std::endl;
 }
 
-bool controls(int *x, int *y)
+/*Whole gamelogic responsible for movement and logic of the game*/
+bool gamelogic(int &x, int &y, int &width, int &height, int &fruitX, int &fruitY, int &score)
 {
     char key = getch();
     switch (key)
     {
-    case 'q': // "Q" key is used to exit the game
-        // pauseGame(true); // make some function to pause the game eh?
-        system("CLS");
+    case 'q': // Q - Quit Game
+
+        system("CLS"); // Clean screen
         std::cout << "Are you sure you want to quit the game? \n Y - yes N - no \n";
         key = getch();
         switch (key)
         {
-        case 'y':
+        case 'y': // Closing game if pressed y key
             system("CLS");
             std::cout << "Thanks for playing snake!";
             return true;
 
-        case 'n':
+        case 'n': // Closing game if pressed n key
+            system("CLS");
+            return false;
+
+        default: // If we pick incorrect key we're just returing to game
             system("CLS");
             return false;
         }
         break;
 
-    case 'w':
-        y++;
-        break;
-    case 'a':
-        x--;
-        break;
-    case 's':
+        /*Movement*/
+    case 'w': // W- UP
         y--;
         break;
-    case 'd':
+    case 'a': // A - LEFT
+        x--;
+        break;
+    case 's': // S - DOWN
+        y++;
+        break;
+    case 'd': // D- RIGHT
         x++;
         break;
     }
+
+    /*If snake touch border endgame*/
+    if (x == width - 1 || x < 1 || y == height - 1 || y < 1)
+    {
+        system("CLS");
+        std::cout << "Game Over!\nScore: " << score;
+        return true;
+    }
+
+    /*If x,y cordinates of snake equals fruit x,y then fruit changing its position and our score is incremented*/
+    if (x == fruitX && y == fruitY)
+    {
+        fruitX = rand() % 19;
+        fruitY = rand() % 19;
+        score++;
+    }
+
     return false;
 }
